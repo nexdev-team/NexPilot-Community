@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import json
+import os
 import secrets
 import shutil
 import subprocess
@@ -14,6 +15,7 @@ SUFFIX = uuid.uuid4().hex[:8]
 NETWORK = "nexpilot-qa-" + SUFFIX
 DATABASE = "nexpilot-db-" + SUFFIX
 PASSWORD = secrets.token_hex(16)
+DOCKER_USER = f"{os.getuid()}:{os.getgid()}"
 
 
 def run(args, *, check=True):
@@ -38,7 +40,7 @@ def main():
 
             def wp(*arguments):
                 return run([
-                    "docker", "run", "--rm", "--network", NETWORK, "--user", "0",
+                    "docker", "run", "--rm", "--network", NETWORK, "--user", DOCKER_USER,
                     "-v", str(site) + ":/var/www/html", "-w", "/var/www/html",
                     "wordpress:cli-php8.1", "wp", *arguments, "--allow-root",
                 ]).stdout.strip()
@@ -104,7 +106,7 @@ echo wp_json_encode([
                 raise AssertionError(f"Integration boundary failed: {observed}")
             wp("plugin", "uninstall", "nexpilot-community", "--deactivate")
             remaining = run([
-                "docker", "run", "--rm", "--network", NETWORK, "--user", "0",
+                "docker", "run", "--rm", "--network", NETWORK, "--user", DOCKER_USER,
                 "-v", str(site) + ":/var/www/html", "-w", "/var/www/html",
                 "wordpress:cli-php8.1", "wp", "option", "get", "nexpilot_community_clients", "--allow-root",
             ], check=False)
