@@ -1,10 +1,10 @@
 # Changelog
 
-## 0.1.0-beta.1 — unreleased
+## 0.1.0-beta.1
 
-- Initial limited read-only WordPress MCP plugin and local stdio bridge.
+- Initial WordPress MCP plugin and local stdio bridge.
 - Separate expiring client credentials and administrator revocation.
 - Published post/page and visible published product reads.
 - Synthetic protocol and bridge tests.
 
-This edition has no release tag or production compatibility certification.
+- Installable WordPress ZIP and downloadable bridge distributed through GitHub Releases.

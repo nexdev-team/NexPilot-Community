@@ -1,42 +1,33 @@
 # NexPilot Community
 
-**A focused, read-only MCP connector for published WordPress content.**
+**Connect published WordPress content to MCP clients through a secure, read-only interface.**
 
-NexPilot Community is developed by [Nexdev](https://nexdev.gr). It gives local MCP clients a bounded way to read published posts, pages, and visible WooCommerce catalog products. Every client receives its own expiring credential. The server enforces the read-only boundary; the bridge also rejects unsupported tools before sending a request.
+NexPilot Community is developed and maintained by [Nexdev](https://nexdev.gr). The WordPress plugin provides a managed MCP endpoint for published posts and pages, with WooCommerce catalog support when WooCommerce is active. Administrators can issue separate, expiring connections for their clients and revoke them at any time.
 
-> **Beta preview:** This repository is being prepared for public release. It has not been presented as a stable product, independently audited, or approved for the WordPress.org Plugin Directory. Validate it on staging before use on a live site.
+[![Download WordPress plugin ZIP](assets/download-plugin.svg)](https://github.com/nexdev-team/NexPilot-Community/releases/download/v0.1.0-beta.1/nexpilot-community.zip)
 
-## Scope
+The download is a ready-to-install WordPress ZIP. The repository is currently private, so GitHub access is required until publication.
 
-| Included | Outside this edition |
-| --- | --- |
-| Published posts and pages | Drafts, private content, users, customers, orders, and form entries |
-| Visible published WooCommerce products | Checkout, refunds, inventory changes, and private product data |
-| Separate 30-day credentials, revocation, HTTPS transport | OAuth, file operations, PHP/SQL/WP-CLI, and administrator access |
-| MCP stdio bridge for local clients | Hosted AI service, telemetry, and automatic updates |
+## Install
 
-The full NexPilot product is maintained separately. This community edition has its own plugin identifier and storage keys, so it is not an in-place update for existing full-edition installations.
+1. Download **[nexpilot-community.zip](https://github.com/nexdev-team/NexPilot-Community/releases/download/v0.1.0-beta.1/nexpilot-community.zip)**. Do not extract it.
+2. In WordPress, open **Plugins → Add New → Upload Plugin**, select the ZIP, then select **Install Now** and **Activate Plugin**.
+3. Open **Tools → NexPilot Community**, enter a name for your MCP client, and select **Create connection**.
+4. Copy the credential displayed once and save it in a private file on the computer running the MCP client.
+5. Download the **[MCP bridge](https://github.com/nexdev-team/NexPilot-Community/releases/download/v0.1.0-beta.1/nexpilot-community-bridge.mjs)** and configure your client as shown below.
 
-## Requirements
+For an existing installation, upload the ZIP again and use WordPress's **Replace current with uploaded** option. Existing connections are retained during an update. Back up the site before changing plugins on a production installation.
 
-- WordPress 6.6 or newer and PHP 8.1 or newer.
-- Node.js 20 or newer for the optional stdio bridge.
-- HTTPS on the WordPress site. A local-only HTTP switch exists for isolated development.
-- WooCommerce only if the product tools are needed.
+## Connect an MCP client
 
-## Install and connect
-
-1. Build the plugin with `python3 build.py`, or package only the `plugin/` directory as `nexpilot-community/`.
-2. Install the ZIP in WordPress. Open **Tools → NexPilot Community** and create a separate connection for each client.
-3. Copy the credential shown once into an owner-only file outside this repository (`chmod 600` on POSIX).
-4. Configure a local MCP stdio client with the bridge:
+The bridge requires Node.js 20 or newer. Save the credential in a file readable only by your account (`chmod 600` on macOS/Linux). Use absolute paths in the client configuration:
 
 ```json
 {
   "mcpServers": {
     "nexpilot-community": {
       "command": "node",
-      "args": ["/absolute/path/to/nexpilot-community/bridge/nexpilot-mcp.mjs"],
+      "args": ["/absolute/path/to/nexpilot-community-bridge.mjs"],
       "env": {
         "NEXPILOT_ENDPOINT": "https://your-site.example/wp-json/nexpilot-community/v1/mcp",
         "NEXPILOT_TOKEN_FILE": "/private/path/client.token"
@@ -46,27 +37,37 @@ The full NexPilot product is maintained separately. This community edition has i
 }
 ```
 
-The exact client configuration format can differ. Keep credentials out of URLs, screenshots, logs, and chat. Revoke a client from WordPress if its credential is no longer controlled.
+Client configuration formats vary. The WordPress site must use HTTPS. Credentials belong in a private file, never in a URL or a committed configuration file. Revoke a connection from **Tools → NexPilot Community** if its credential is lost.
 
-## MCP tools
+## Capabilities
 
-`site_info`, `content_list`, `content_get`, `products_list`, and `product_get`. Lists are paginated and bounded. Content tools require published posts or pages; product tools require visible published products. Returned text is size limited. No mutation tool is registered.
+The connector offers five MCP tools: `site_info`, `content_list`, `content_get`, `products_list`, and `product_get`. It returns published posts and pages and visible, published WooCommerce products. Lists are paginated and text responses are size limited. The WordPress endpoint checks each request independently of the bridge.
 
-## Verification
+## Requirements
+
+| Component | Minimum version |
+| --- | --- |
+| WordPress | 6.6 |
+| PHP | 8.1 |
+| Node.js for the MCP bridge | 20 |
+
+WooCommerce is needed for product tools. The WordPress site must serve the MCP endpoint over HTTPS.
+
+## Development
 
 ```sh
 php tests/protocol.php
 node --test tests/bridge.test.mjs
+python3 tests/integration-docker.py
 python3 build.py
-python3 tests/integration-docker.py # optional disposable WordPress + MariaDB check
 ```
 
-The PHP tests use WordPress doubles and cover credential handling, transport checks, published-content boundaries, and the advertised tool set. The Docker check installs the plugin on a disposable real WordPress/MariaDB site with synthetic content, then verifies a published read, draft denial, revocation, and uninstall cleanup. The bridge tests cover concurrent clients, token-file permissions, redirects, and pre-network rejection of mutation calls. These checks do not establish complete WooCommerce, administrator UI, version-matrix, or hosting compatibility. See [release criteria](docs/RELEASE.md) for remaining work.
+`build.py` creates the installable plugin ZIP, bridge file, and SHA-256 checksums in `dist/`. The integration check uses a disposable WordPress/MariaDB site with synthetic content. Release preparation and verification are documented in [docs/RELEASE.md](docs/RELEASE.md).
 
-## Project practices
+## Project information
 
-The repository contains reviewed source, reproducible build instructions, and synthetic tests. Client-specific scripts, production evidence, historical binaries, credentials, and private runtime data remain outside this project. See [architecture](docs/ARCHITECTURE.md), [security](SECURITY.md), and [contributing](CONTRIBUTING.md).
-
-## License
-
-GPL-2.0-or-later. See [LICENSE](LICENSE).
+- [Architecture](docs/ARCHITECTURE.md)
+- [Security policy](SECURITY.md)
+- [Contributing](CONTRIBUTING.md)
+- [Changelog](CHANGELOG.md)
+- [GPL-2.0-or-later license](LICENSE)

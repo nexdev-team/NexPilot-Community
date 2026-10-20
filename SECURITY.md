@@ -2,9 +2,9 @@
 
 NexPilot Community handles client credentials and publishes a narrow read-only MCP endpoint. Please report a suspected vulnerability privately to the repository maintainers through GitHub's vulnerability reporting feature when it is available. If that feature is unavailable, contact Nexdev through its [official website](https://nexdev.gr) and request a private reporting channel. Do not post credentials, exploit details, or customer data in a public issue.
 
-## Current support scope
+## Supported version
 
-The `main` branch is a beta preview. Security fixes are prioritized there. No historical version or production support window is promised yet.
+Security fixes are prioritized for the current release and `main` branch. Release notes identify each supported version.
 
 ## Trust boundaries
 
@@ -14,4 +14,4 @@ The `main` branch is a beta preview. Security fixes are prioritized there. No hi
 - The local bridge reads its credential from an owner-only file, rejects redirects, and filters the advertised tool list.
 - A credential still allows its holder to retrieve the published data exposed by this connector. Protect the client machine and revoke lost credentials.
 
-These boundaries require testing on the intended WordPress/WooCommerce versions before a production deployment. The included PHP doubles and bridge tests are not an independent audit.
+Test updates on a staging copy of the intended WordPress/WooCommerce installation before deploying them to production.

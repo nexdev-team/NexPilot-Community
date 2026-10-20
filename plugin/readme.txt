@@ -10,13 +10,11 @@ Read-only MCP access to published WordPress posts, pages and visible WooCommerce
 
 == Description ==
 
-NexPilot Community is a limited, read-only edition maintained by Nexdev. It creates separate expiring client credentials and exposes five MCP read tools. It does not provide content changes, orders, customer data, PHP or SQL execution, file management, WP-CLI, OAuth, or administrator access. WooCommerce is optional; product tools report unavailable if it is not active.
-
-This is a beta preview. Validate on a staging site before production use.
+NexPilot Community is developed and maintained by Nexdev. It creates separate, expiring client credentials for MCP access to published WordPress posts and pages. When WooCommerce is active, the connector also reads visible, published catalog products. Administrators can revoke connections from the WordPress dashboard.
 
 == Installation ==
 
-Install the plugin ZIP through WordPress. In Tools > NexPilot Community, create a connection for each local MCP client. Store each credential outside the repository in an owner-only file. Use the companion Node.js bridge for stdio clients.
+Download the plugin ZIP from the project's GitHub release. In WordPress, open Plugins > Add New > Upload Plugin, select the ZIP, install it, and activate it. In Tools > NexPilot Community, create a connection for each local MCP client. Store each credential in an owner-only file. Download the companion Node.js bridge from the same release for stdio clients.
 
 HTTPS is required for the MCP endpoint. HTTP is allowed only when an administrator explicitly defines NEXPILOT_COMMUNITY_ALLOW_LOCAL_HTTP in a WordPress local environment.
 
@@ -29,4 +27,4 @@ Uninstall removes the connector's stored client records. Deactivation leaves the
 == Changelog ==
 
 = 0.1.0-beta.1 =
-Initial limited read-only preview. No compatibility claim for the full private NexPilot edition.
+Initial WordPress MCP connector with published content and WooCommerce catalog access.

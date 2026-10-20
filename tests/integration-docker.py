@@ -63,10 +63,17 @@ def main():
                 "--admin_user=synthetic_admin", "--admin_password=" + secrets.token_hex(16),
                 "--admin_email=admin@example.invalid", "--skip-email",
             )
-            target = site / "wp-content/plugins/nexpilot-community"
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copytree(ROOT / "plugin", target)
-            wp("plugin", "activate", "nexpilot-community")
+            archive_name = os.environ.get("NEXPILOT_INSTALL_ZIP")
+            if archive_name:
+                archive = ROOT / archive_name
+                installer = site / "nexpilot-community.zip"
+                shutil.copy2(archive, installer)
+                wp("plugin", "install", installer.name, "--activate")
+            else:
+                target = site / "wp-content/plugins/nexpilot-community"
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copytree(ROOT / "plugin", target)
+                wp("plugin", "activate", "nexpilot-community")
 
             result = wp("eval", r'''
 $_SERVER['HTTPS'] = 'on';

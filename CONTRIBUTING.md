@@ -1,6 +1,6 @@
 # Contributing
 
-We welcome focused improvements that preserve the limited, read-only scope of NexPilot Community. Open an issue before proposing a new capability or protocol change so its privacy and compatibility impact can be reviewed.
+We welcome focused improvements to NexPilot Community. Open an issue before proposing a new capability or protocol change so its privacy and compatibility impact can be reviewed.
 
 ## Development
 

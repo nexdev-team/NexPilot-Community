@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install PHP CLI
+        run: sudo apt-get update && sudo apt-get install -y php-cli
+      - name: Verify version and release notes
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import re
+          tag = os.environ['GITHUB_REF_NAME']
+          header = Path('plugin/nexpilot-community.php').read_text()
+          version = re.search(r'\* Version: ([0-9A-Za-z.-]+)', header)
+          constant = re.search(r"const VERSION = '([0-9A-Za-z.-]+)'", header)
+          readme = Path('plugin/readme.txt').read_text()
+          if not version or not constant or tag != 'v' + version.group(1) or constant.group(1) != version.group(1):
+              raise SystemExit('Git tag, plugin header, and VERSION must match')
+          if f'Stable tag: {version.group(1)}' not in readme:
+              raise SystemExit('Plugin readme version does not match')
+          if not Path(f'docs/releases/{tag}.md').is_file():
+              raise SystemExit('Release notes are missing')
+          PY
+      - name: Test PHP protocol
+        run: php tests/protocol.php
+      - name: Test MCP bridge
+        run: node --test tests/bridge.test.mjs
+      - name: Build installable files
+        run: python3 build.py
+      - name: Inspect archive
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          archive = Path('dist/nexpilot-community.zip')
+          expected = {
+              'nexpilot-community/LICENSE',
+              'nexpilot-community/nexpilot-community.php',
+              'nexpilot-community/readme.txt',
+              'nexpilot-community/uninstall.php',
+              'nexpilot-community/includes/Admin.php',
+              'nexpilot-community/includes/Credentials.php',
+              'nexpilot-community/includes/Protocol.php',
+          }
+          with ZipFile(archive) as package:
+              if set(package.namelist()) != expected:
+                  raise SystemExit('Unexpected files in WordPress installer')
+          PY
+      - name: Install ZIP on disposable WordPress
+        env:
+          NEXPILOT_INSTALL_ZIP: dist/nexpilot-community.zip
+        run: python3 tests/integration-docker.py
+      - name: Publish private repository release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags=()
+          case "$GITHUB_REF_NAME" in *-*) flags+=(--prerelease);; esac
+          gh release create "$GITHUB_REF_NAME" \
+            dist/nexpilot-community.zip dist/nexpilot-community.zip.sha256 \
+            dist/nexpilot-community-bridge.mjs dist/nexpilot-community-bridge.mjs.sha256 \
+            --title "NexPilot Community $GITHUB_REF_NAME" \
+            --notes-file "docs/releases/$GITHUB_REF_NAME.md" \
+            "${flags[@]}"

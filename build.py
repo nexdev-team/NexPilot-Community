@@ -8,14 +8,14 @@ import zipfile
 root = Path(__file__).resolve().parent
 source = root / "plugin"
 for file in sorted(source.rglob("*.php")):
-    subprocess.run(["php", "-l", str(file)], check=True, capture_output=True)
+    subprocess.run(["php", "-l", str(file.relative_to(root))], check=True, capture_output=True, cwd=root)
 
 header = (source / "nexpilot-community.php").read_text()
 version = re.search(r"\* Version: ([0-9A-Za-z.-]+)", header)
 if not version:
     raise SystemExit("Missing plugin version")
 
-archive = root / "dist" / f"nexpilot-community-{version.group(1)}.zip"
+archive = root / "dist" / "nexpilot-community.zip"
 archive.parent.mkdir(exist_ok=True)
 with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as z:
     for file in sorted(source.rglob("*")):
@@ -30,4 +30,8 @@ with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as z:
 
 checksum = hashlib.sha256(archive.read_bytes()).hexdigest()
 archive.with_suffix(".zip.sha256").write_text(f"{checksum}  {archive.name}\n")
-print(f"Built {archive.name}")
+bridge = root / "dist" / "nexpilot-community-bridge.mjs"
+bridge.write_bytes((root / "bridge" / "nexpilot-mcp.mjs").read_bytes())
+bridge_checksum = hashlib.sha256(bridge.read_bytes()).hexdigest()
+bridge.with_suffix(".mjs.sha256").write_text(f"{bridge_checksum}  {bridge.name}\n")
+print(f"Built {archive.name} and {bridge.name} for version {version.group(1)}")
