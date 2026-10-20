@@ -1,20 +1,16 @@
 # Architecture
 
 ```text
-Local MCP client ── stdio ── Node.js bridge ── HTTPS + bearer token ── WordPress REST route
-                                                                     │
-                                                                     ├─ published posts/pages
-                                                                     └─ visible published products
+MCP client ── stdio bridge or OAuth HTTP ── WordPress REST routes
+                                              │
+                                              ├─ permissions and connection lifecycle
+                                              ├─ WordPress/WooCommerce resources
+                                              ├─ proposals and administrator approval
+                                              └─ audit, jobs, files, and maintenance
 ```
 
-The bridge starts one process per client. It reads an owner-only credential file and never places the credential in a URL. It rejects redirects, remote HTTP, oversized responses, and tool calls outside the five read tools.
+The WordPress entry point is `plugin/nexdev-site-connector.php`. It registers the MCP endpoint at `nexdev-connector/v1/mcp`, OAuth routes, transfer routes, administrator controls, and the original `nsc_` storage namespace. The local stdio bridge is `bridge/nexdev-mcp.mjs` and uses the `NSC_` environment variables.
 
-The WordPress plugin independently authenticates each request against a stored credential hash. The REST route advertises only read tools. Content and product status/visibility are checked again before returning records; lists are paginated and result text is bounded. WooCommerce is optional.
+Each connection has its own permissions and expiry. Writes are proposed against a resource revision, reviewed by a WordPress administrator, and rechecked under the storage lock before execution. Maintenance operations additionally require a temporary administrator-opened window. Full maintenance executes with unrestricted WordPress/server-account power; its approval workflow is not an isolation boundary.
 
-The plugin uses the `nexpilot-community` identifier and `nexpilot_community_` option namespace for its connection records.
-
-## Operational notes
-
-- Read-only refers to this connector's tool surface; other WordPress plugins, users, and clients retain their own permissions.
-- Only published content is exposed, but published content may still contain information the site owner considers sensitive. Review the site before connecting a model provider.
-- The PHP test harness uses WordPress doubles. A disposable WordPress/MariaDB test covers activation, published reads, draft denial, revocation, and uninstall cleanup. The release checklist tracks further compatibility verification.
+The source files under `plugin/` and `bridge/` are maintained as an unchanged runtime snapshot of the corresponding `0.2.1-beta.1` implementation while parity is verified. Publication documents and packaging live outside that runtime surface.

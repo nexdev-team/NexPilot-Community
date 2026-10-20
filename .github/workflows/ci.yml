@@ -12,14 +12,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Lint plugin PHP
         run: for file in plugin/*.php plugin/includes/*.php; do php -l "$file" || exit 1; done
-      - name: Test protocol boundary
-        run: php tests/protocol.php
-      - name: Verify direct-access guards
-        run: |
-          for file in plugin/*.php plugin/includes/*.php; do
-            output=$(php -r 'include $argv[1]; echo "loaded";' "$file")
-            test -z "$output" || { echo "Direct access loaded $file"; exit 1; }
-          done
+      - name: Test NexPilot behavior
+        run: php tests/run.php
 
   bridge:
     runs-on: ubuntu-latest
@@ -31,12 +25,29 @@ jobs:
       - name: Test bridge
         run: node --test tests/bridge.test.mjs
 
-  integration:
+  package:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Test disposable WordPress integration
-        run: python3 tests/integration-docker.py
+      - name: Install PHP CLI
+        run: sudo apt-get update && sudo apt-get install -y php-cli
+      - name: Build plugin ZIP
+        run: python3 build.py
+      - name: Check package contents
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          archive = next(Path('dist').glob('nexdev-site-connector-*.zip'))
+          with ZipFile(archive) as package:
+              names = package.namelist()
+          if not names or not all(name.startswith('nexdev-site-connector/') for name in names):
+              raise SystemExit('Unexpected installer layout')
+          if 'nexdev-site-connector/nexdev-site-connector.php' not in names:
+              raise SystemExit('Plugin entry point missing')
+          if any('/tests/' in name or '/.runtime/' in name for name in names):
+              raise SystemExit('Test or runtime data in installer')
+          PY

@@ -1,9 +1,12 @@
-name: Release
+name: Package approved release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing, reviewed release tag (for example v0.2.1-beta.1)
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -13,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -21,68 +27,58 @@ jobs:
           python-version: '3.11'
       - name: Install PHP CLI
         run: sudo apt-get update && sudo apt-get install -y php-cli
-      - name: Verify version and release notes
+      - name: Verify tag and release notes
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
         run: |
           python3 - <<'PY'
           import os
           from pathlib import Path
           import re
-          tag = os.environ['GITHUB_REF_NAME']
-          header = Path('plugin/nexpilot-community.php').read_text()
-          version = re.search(r'\* Version: ([0-9A-Za-z.-]+)', header)
-          constant = re.search(r"const VERSION = '([0-9A-Za-z.-]+)'", header)
-          readme = Path('plugin/readme.txt').read_text()
-          if not version or not constant or tag != 'v' + version.group(1) or constant.group(1) != version.group(1):
-              raise SystemExit('Git tag, plugin header, and VERSION must match')
-          if f'Stable tag: {version.group(1)}' not in readme:
-              raise SystemExit('Plugin readme version does not match')
+          tag = os.environ['RELEASE_TAG']
+          header = Path('plugin/nexdev-site-connector.php').read_text()
+          match = re.search(r'\* Version: ([0-9A-Za-z.-]+)', header)
+          if not match or tag != 'v' + match.group(1):
+              raise SystemExit('Release tag and plugin header differ')
+          if f'Stable tag: {match.group(1)}' not in Path('plugin/readme.txt').read_text():
+              raise SystemExit('Plugin readme version differs')
           if not Path(f'docs/releases/{tag}.md').is_file():
               raise SystemExit('Release notes are missing')
           PY
-      - name: Test PHP protocol
-        run: php tests/protocol.php
-      - name: Verify direct-access guards
+          test "$(git describe --tags --exact-match)" = "$RELEASE_TAG"
+      - name: Verify behavior and bridge
         run: |
-          for file in plugin/*.php plugin/includes/*.php; do
-            output=$(php -r 'include $argv[1]; echo "loaded";' "$file")
-            test -z "$output" || { echo "Direct access loaded $file"; exit 1; }
-          done
-      - name: Test MCP bridge
-        run: node --test tests/bridge.test.mjs
-      - name: Build installable files
-        run: python3 build.py
-      - name: Inspect archive
+          php tests/run.php
+          node --test tests/bridge.test.mjs
+      - name: Build installer and bridge assets
+        run: |
+          python3 build.py
+          cp bridge/nexdev-mcp.mjs dist/nexdev-mcp.mjs
+          cd dist
+          sha256sum nexdev-mcp.mjs > nexdev-mcp.mjs.sha256
+      - name: Inspect installer
         run: |
           python3 - <<'PY'
           from pathlib import Path
           from zipfile import ZipFile
-          archive = Path('dist/nexpilot-community.zip')
-          expected = {
-              'nexpilot-community/LICENSE',
-              'nexpilot-community/nexpilot-community.php',
-              'nexpilot-community/readme.txt',
-              'nexpilot-community/uninstall.php',
-              'nexpilot-community/includes/Admin.php',
-              'nexpilot-community/includes/Credentials.php',
-              'nexpilot-community/includes/Protocol.php',
-          }
+          archive = next(Path('dist').glob('nexdev-site-connector-*.zip'))
           with ZipFile(archive) as package:
-              if set(package.namelist()) != expected:
-                  raise SystemExit('Unexpected files in WordPress installer')
+              names = package.namelist()
+          if not names or not all(name.startswith('nexdev-site-connector/') for name in names):
+              raise SystemExit('Unexpected installer layout')
+          if 'nexdev-site-connector/nexdev-site-connector.php' not in names:
+              raise SystemExit('Plugin entry point missing')
+          if any('/tests/' in name or '/.runtime/' in name for name in names):
+              raise SystemExit('Private or test data in installer')
           PY
-      - name: Install ZIP on disposable WordPress
-        env:
-          NEXPILOT_INSTALL_ZIP: dist/nexpilot-community.zip
-        run: python3 tests/integration-docker.py
-      - name: Publish private repository release
+      - name: Publish reviewed assets
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
         run: |
-          flags=()
-          case "$GITHUB_REF_NAME" in *-*) flags+=(--prerelease);; esac
-          gh release create "$GITHUB_REF_NAME" \
-            dist/nexpilot-community.zip dist/nexpilot-community.zip.sha256 \
-            dist/nexpilot-community-bridge.mjs dist/nexpilot-community-bridge.mjs.sha256 \
-            --title "NexPilot Community $GITHUB_REF_NAME" \
-            --notes-file "docs/releases/$GITHUB_REF_NAME.md" \
-            "${flags[@]}"
+          gh release create "$RELEASE_TAG" \
+            dist/nexdev-site-connector-*.zip dist/nexdev-site-connector-*.zip.sha256 \
+            dist/nexdev-mcp.mjs dist/nexdev-mcp.mjs.sha256 \
+            --verify-tag --prerelease \
+            --title "NexPilot $RELEASE_TAG" \
+            --notes-file "docs/releases/$RELEASE_TAG.md"

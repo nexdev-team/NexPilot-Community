@@ -1,15 +1,7 @@
 # Contributing
 
-We welcome focused improvements to NexPilot Community. Open an issue before proposing a new capability or protocol change so its privacy and compatibility impact can be reviewed.
+Contributions must preserve the established MCP contracts, WordPress plugin identity, permission checks, approval workflow, and connection storage behavior. Describe any proposed behavior change explicitly and include tests that demonstrate compatibility with existing clients.
 
-## Development
+Run `php tests/run.php`, `node --test tests/bridge.test.mjs`, and `python3 build.py` before proposing changes. The PHP suite uses test doubles. Changes involving WordPress, WooCommerce, OAuth, MySQL/MariaDB, or maintenance also need staging integration evidence before release.
 
-1. Work against a disposable WordPress installation with synthetic content.
-2. Run `php tests/protocol.php`, `node --test tests/bridge.test.mjs`, and `python3 build.py`.
-   For integration changes, also run `python3 tests/integration-docker.py` with Docker available.
-3. Describe the behavior, test evidence, and compatibility limits in the pull request.
-4. Keep commits small and use a professional Git identity that you intend to publish.
-
-Keep credentials, private URLs, database exports, logs, and third-party assets out of contributions. Report suspected security issues privately using [SECURITY.md](SECURITY.md).
-
-Submissions are expected to be original work or include the required compatible license notices. By submitting a contribution, you agree that it is distributed under this repository's GPL-2.0-or-later license.
+Keep credentials, private URLs, database exports, logs, and third-party assets out of contributions. Use synthetic test data and report vulnerabilities through [SECURITY.md](SECURITY.md). Contributions must be original or carry compatible license notices and are distributed under GPL-2.0-or-later.

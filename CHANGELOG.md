@@ -1,10 +1,9 @@
 # Changelog
 
-## 0.1.0-beta.1
+## 0.2.1-beta.1 — parity candidate
 
-- Initial WordPress MCP plugin and local stdio bridge.
-- Separate expiring client credentials and administrator revocation.
-- Published post/page and visible published product reads.
-- Synthetic protocol and bridge tests.
+- Prepared the full NexPilot runtime implementation for a separate distribution repository.
+- Preserved the original WordPress plugin identity, MCP contracts, bridge configuration, and feature set.
+- Rewrote distribution documentation to remove environment-specific material.
 
-- Installable WordPress ZIP and downloadable bridge distributed through GitHub Releases.
+The runtime version is unchanged. A new release has not been published from this candidate.

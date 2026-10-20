@@ -1,17 +1,13 @@
 # Security policy
 
-NexPilot Community handles connection credentials and publishes a read-only MCP endpoint. Please report a suspected vulnerability privately to the repository maintainers through GitHub's vulnerability reporting feature when it is available. If that feature is unavailable, contact Nexdev through its [official website](https://nexdev.gr) and request a private reporting channel. Do not post credentials or exploit details in a public issue.
+Report suspected vulnerabilities privately through GitHub's **Report a vulnerability** feature for this repository. If that option is unavailable, contact [Nexdev](https://nexdev.gr) and request a private security reporting channel. Do not put exploit details or credentials in public issues.
 
-## Supported version
+## Security model
 
-Security fixes are prioritized for the current release and `main` branch. Release notes identify each supported version.
+- WordPress administrators grant and revoke individual connections. Content, commerce, and maintenance permissions are separate.
+- Changes require an exact proposal and a separate administrator approval; the plugin rechecks identity, expiry, authorization, and resource revision before execution.
+- Full maintenance is deliberately unrestricted access to the WordPress/server account. A temporary maintenance window limits when new connector actions can begin; it does not sandbox PHP, SQL, WP-CLI, files, or external effects.
+- Keep the MCP endpoint on HTTPS. Store connection credentials in owner-only files, never in URLs or version control.
+- An MCP client's model provider may receive data returned to that client under its configuration. Review that configuration before granting access.
 
-## Trust boundaries
-
-- A WordPress administrator issues and revokes each bearer credential. Only a SHA-256 hash is stored by the plugin; the credential is displayed once.
-- The MCP route requires HTTPS except for an explicitly enabled WordPress local environment. Browser Origin headers are rejected.
-- Tools return only published posts/pages and visible published products. No write or administrator tool is registered.
-- The local bridge reads its credential from an owner-only file, rejects redirects, and filters the advertised tool list.
-- A credential still allows its holder to retrieve the published data exposed by this connector. Protect the client machine and revoke lost credentials.
-
-Test updates on a staging copy of the intended WordPress/WooCommerce installation before deploying them to production.
+The `0.2.1-beta.1` build remains a beta. Local tests and this policy are not an independent security certification.

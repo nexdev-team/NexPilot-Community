@@ -1,68 +1,56 @@
-# NexPilot Community
+# NexPilot Beta
 
-**Connect published WordPress content to MCP clients through a secure, read-only interface.**
+**WordPress and WooCommerce operations through independent MCP connections, with human review for changes.**
 
-NexPilot Community is developed and maintained by [Nexdev](https://nexdev.gr). The WordPress plugin provides a managed MCP endpoint for published posts and pages, with WooCommerce catalog support when WooCommerce is active. Administrators can issue separate, expiring connections for their clients and revoke them at any time.
+NexPilot is developed by [Nexdev](https://nexdev.gr). This repository carries the full `0.2.1-beta.1` plugin implementation under its original WordPress plugin identity, `nexdev-site-connector`. The MCP endpoint, tool names, connection format, storage keys, and Node.js bridge settings follow that implementation.
 
-[![Download WordPress plugin ZIP](assets/download-plugin.svg)](https://github.com/nexdev-team/NexPilot-Community/releases/download/v0.1.0-beta.1/nexpilot-community.zip)
+The previously published `v0.1.0-beta.1` Community ZIP is a separate, reduced implementation. It is not an update for this plugin. A new download will be published only after the full build and release checks are complete.
 
-The download is a ready-to-install WordPress ZIP. The repository is currently private, so GitHub access is required until publication.
+[Implementation parity and verification](docs/PARITY.md) records the comparison with the original source edition. No plugin behavior was rewritten for this candidate.
 
-## Install
+## Capabilities
 
-1. Download **[nexpilot-community.zip](https://github.com/nexdev-team/NexPilot-Community/releases/download/v0.1.0-beta.1/nexpilot-community.zip)**. Do not extract it.
-2. In WordPress, open **Plugins → Add New → Upload Plugin**, select the ZIP, then select **Install Now** and **Activate Plugin**.
-3. Open **Tools → NexPilot Community**, enter a name for your MCP client, and select **Create connection**.
-4. Copy the credential displayed once and save it in a private file on the computer running the MCP client.
-5. Download the **[MCP bridge](https://github.com/nexdev-team/NexPilot-Community/releases/download/v0.1.0-beta.1/nexpilot-community-bridge.mjs)** and configure your client as shown below.
+- Separate, expiring connections with read, content, commerce, and maintenance permissions; administrator rotation, revocation, and emergency disable.
+- MCP tools for WordPress content, WooCommerce resources, Gutenberg blocks, libraries, design records, and supported extension adapters.
+- Exact change proposals, WordPress administrator approval, resource revision checks, audit records, and execution locking.
+- Native OAuth with administrator consent and a local stdio bridge for MCP clients.
+- Temporary full maintenance, including PHP, SQL, WP-CLI, files, and administrator access. **Full maintenance is unrestricted access, not a sandbox.** It requires an explicit connection permission and a human-opened maintenance window.
 
-For an existing installation, upload the ZIP again and use WordPress's **Replace current with uploaded** option. Existing connections are retained during an update. Back up the site before changing plugins on a production installation.
+The plugin is beta software. It requires PHP Sodium and a supported database advisory lock configuration. Validate the target WordPress, WooCommerce, PHP, database, and hosting configuration in staging before production use. The installer does not include an automatic updater.
 
-## Connect an MCP client
+## Install and connect
 
-The bridge requires Node.js 20 or newer. Save the credential in a file readable only by your account (`chmod 600` on macOS/Linux). Use absolute paths in the client configuration:
+1. Build the plugin ZIP with `python3 build.py`. The output is `dist/nexdev-site-connector-0.2.1-beta.1.zip`.
+2. In WordPress, open **Plugins → Add New → Upload Plugin**, install the ZIP, and activate it.
+3. Open **Tools → NexPilot**. Create a separate connection for each MCP client and keep its one-time credential in a private file.
+4. Configure the Node.js 20+ stdio bridge when the MCP client uses stdio:
 
 ```json
 {
   "mcpServers": {
-    "nexpilot-community": {
+    "nexdev-site": {
       "command": "node",
-      "args": ["/absolute/path/to/nexpilot-community-bridge.mjs"],
+      "args": ["/absolute/path/to/bridge/nexdev-mcp.mjs"],
       "env": {
-        "NEXPILOT_ENDPOINT": "https://your-site.example/wp-json/nexpilot-community/v1/mcp",
-        "NEXPILOT_TOKEN_FILE": "/private/path/client.token"
+        "NSC_ENDPOINT": "https://your-site.example/wp-json/nexdev-connector/v1/mcp",
+        "NSC_TOKEN_FILE": "/private/path/client.token"
       }
     }
   }
 }
 ```
 
-Client configuration formats vary. The WordPress site must use HTTPS. Credentials belong in a private file, never in a URL or a committed configuration file. Revoke a connection from **Tools → NexPilot Community** if its credential is lost.
+The site must serve the MCP endpoint over HTTPS. Keep credentials out of URLs, logs, and source control. The exact client configuration format depends on the application.
 
-## Capabilities
-
-The connector offers five MCP tools: `site_info`, `content_list`, `content_get`, `products_list`, and `product_get`. It returns published posts and pages and visible, published WooCommerce products. Lists are paginated and text responses are size limited. The WordPress endpoint checks each request independently of the bridge.
-
-## Requirements
-
-| Component | Minimum version |
-| --- | --- |
-| WordPress | 6.6 |
-| PHP | 8.1 |
-| Node.js for the MCP bridge | 20 |
-
-WooCommerce is needed for product tools. The WordPress site must serve the MCP endpoint over HTTPS.
-
-## Development
+## Verify
 
 ```sh
-php tests/protocol.php
+php tests/run.php
 node --test tests/bridge.test.mjs
-python3 tests/integration-docker.py
 python3 build.py
 ```
 
-`build.py` creates the installable plugin ZIP, bridge file, and SHA-256 checksums in `dist/`. The integration check uses a disposable WordPress/MariaDB site with synthetic content. Release preparation and verification are documented in [docs/RELEASE.md](docs/RELEASE.md).
+The PHP suite uses WordPress/MySQL doubles and does not certify a production installation. The release process requires separate WordPress, WooCommerce, security, and packaging verification. See [release checks](docs/RELEASE.md).
 
 ## Project information
 
