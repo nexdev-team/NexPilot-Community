@@ -1,0 +1,16 @@
+/dist/
+/.runtime/
+/node_modules/
+/.env
+/.env.*
+*.token
+*.key
+*.pem
+*.p12
+*.pfx
+*.sql
+*.sql.gz
+*.sqlite*
+*.log
+.DS_Store
+__pycache__/

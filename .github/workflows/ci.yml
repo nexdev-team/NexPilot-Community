@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    container: php:8.1-cli
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint plugin PHP
+        run: for file in plugin/*.php plugin/includes/*.php; do php -l "$file" || exit 1; done
+      - name: Test protocol boundary
+        run: php tests/protocol.php
+
+  bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Test bridge
+        run: node --test tests/bridge.test.mjs

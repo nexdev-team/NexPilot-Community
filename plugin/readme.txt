@@ -1,0 +1,30 @@
+=== NexPilot Community ===
+Contributors: nexdev
+Requires at least: 6.6
+Requires PHP: 8.1
+Stable tag: 0.1.0-beta.1
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+
+Read-only MCP access to published WordPress posts, pages and visible WooCommerce catalog products.
+
+== Description ==
+
+NexPilot Community is a limited, read-only edition maintained by Nexdev. It creates separate expiring client credentials and exposes five MCP read tools. It does not provide content changes, orders, customer data, PHP or SQL execution, file management, WP-CLI, OAuth, or administrator access. WooCommerce is optional; product tools report unavailable if it is not active.
+
+This is a beta preview. Validate on a staging site before production use.
+
+== Installation ==
+
+Install the plugin ZIP through WordPress. In Tools > NexPilot Community, create a connection for each local MCP client. Store each credential outside the repository in an owner-only file. Use the companion Node.js bridge for stdio clients.
+
+HTTPS is required for the MCP endpoint. HTTP is allowed only when an administrator explicitly defines NEXPILOT_COMMUNITY_ALLOW_LOCAL_HTTP in a WordPress local environment.
+
+== Privacy ==
+
+The plugin does not contact an AI provider. A configured MCP client receives published content and can share that content with its provider under that client's settings and terms. No fixed telemetry endpoint is included. The plugin stores client labels, credential hashes, and creation and expiry times in a WordPress option. Revoke clients from the WordPress admin page when no longer needed.
+
+== Changelog ==
+
+= 0.1.0-beta.1 =
+Initial limited read-only preview. No compatibility claim for the full private NexPilot edition.
