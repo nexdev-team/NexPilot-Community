@@ -24,6 +24,8 @@ HTTPS is required for the MCP endpoint. HTTP is allowed only when an administrat
 
 The plugin does not contact an AI provider. A configured MCP client receives published content and can share that content with its provider under that client's settings and terms. No fixed telemetry endpoint is included. The plugin stores client labels, credential hashes, and creation and expiry times in a WordPress option. Revoke clients from the WordPress admin page when no longer needed.
 
+Uninstall removes the connector's stored client records. Deactivation leaves them intact so existing connections can be restored if the plugin is reactivated.
+
 == Changelog ==
 
 = 0.1.0-beta.1 =

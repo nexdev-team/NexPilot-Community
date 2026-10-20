@@ -17,4 +17,4 @@ The plugin uses its own `nexpilot-community` identifier and `nexpilot_community_
 
 - Read-only refers to this connector's tool surface; other WordPress plugins, users, and clients retain their own permissions.
 - Only published content is exposed, but published content may still contain information the site owner considers sensitive. Review the site before connecting a model provider.
-- The PHP test harness uses WordPress doubles. Real WordPress/WooCommerce and hosting behavior remain release gates.
+- The PHP test harness uses WordPress doubles. A disposable WordPress/MariaDB test covers activation, published reads, draft denial, revocation, and uninstall cleanup. WooCommerce, administrator UI, version-matrix, and hosting behavior remain release gates.

@@ -58,9 +58,10 @@ The exact client configuration format can differ. Keep credentials out of URLs, 
 php tests/protocol.php
 node --test tests/bridge.test.mjs
 python3 build.py
+python3 tests/integration-docker.py # optional disposable WordPress + MariaDB check
 ```
 
-The PHP tests use WordPress doubles and cover credential handling, transport checks, published-content boundaries, and the advertised tool set. They do not establish complete WordPress, WooCommerce, database, or hosting compatibility. The bridge tests cover concurrent clients, token-file permissions, redirects, and pre-network rejection of mutation calls. See [release criteria](docs/RELEASE.md) for remaining integration work.
+The PHP tests use WordPress doubles and cover credential handling, transport checks, published-content boundaries, and the advertised tool set. The Docker check installs the plugin on a disposable real WordPress/MariaDB site with synthetic content, then verifies a published read, draft denial, revocation, and uninstall cleanup. The bridge tests cover concurrent clients, token-file permissions, redirects, and pre-network rejection of mutation calls. These checks do not establish complete WooCommerce, administrator UI, version-matrix, or hosting compatibility. See [release criteria](docs/RELEASE.md) for remaining work.
 
 ## Project practices
 

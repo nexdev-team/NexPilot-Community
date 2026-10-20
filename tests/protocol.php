@@ -45,7 +45,7 @@ function get_woocommerce_currency() { return 'EUR'; }
 class WP_REST_Request {
     public function __construct(private string $body, private array $headers = []) {}
     public function get_body(): string { return $this->body; }
-    public function get_header(string $name): string { return $this->headers[strtolower($name)] ?? ''; }
+    public function get_header(string $name): ?string { return $this->headers[strtolower($name)] ?? null; }
 }
 class WP_REST_Response {
     private array $headers = [];

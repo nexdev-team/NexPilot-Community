@@ -21,9 +21,9 @@ final class Protocol {
         $local_http = defined('NEXPILOT_COMMUNITY_ALLOW_LOCAL_HTTP')
             && NEXPILOT_COMMUNITY_ALLOW_LOCAL_HTTP
             && wp_get_environment_type() === 'local';
-        if ((!is_ssl() && !$local_http) || $request->get_header('origin') !== ''
+        if ((!is_ssl() && !$local_http) || (string) $request->get_header('origin') !== ''
             || strlen($request->get_body()) > self::MAX_REQUEST_BYTES
-            || Credentials::verify($request->get_header('authorization')) === null) {
+            || Credentials::verify((string) $request->get_header('authorization')) === null) {
             return new \WP_Error('nexpilot_access_denied', 'Connection denied.', ['status' => 403]);
         }
         return true;

@@ -6,6 +6,7 @@ We welcome focused improvements that preserve the limited, read-only scope of Ne
 
 1. Work against a disposable WordPress installation with synthetic content.
 2. Run `php tests/protocol.php`, `node --test tests/bridge.test.mjs`, and `python3 build.py`.
+   For integration changes, also run `python3 tests/integration-docker.py` with Docker available.
 3. Describe the behavior, test evidence, and compatibility limits in the pull request.
 4. Keep commits small and use a professional Git identity that you intend to publish.
 
