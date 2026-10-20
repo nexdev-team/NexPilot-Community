@@ -10,6 +10,6 @@ We welcome focused improvements to NexPilot Community. Open an issue before prop
 3. Describe the behavior, test evidence, and compatibility limits in the pull request.
 4. Keep commits small and use a professional Git identity that you intend to publish.
 
-Never include client credentials, live site URLs, customer information, database exports, private logs, screenshots of authorization flows, or commercial plugin archives. Report suspected security issues privately using [SECURITY.md](SECURITY.md).
+Keep credentials, private URLs, database exports, logs, and third-party assets out of contributions. Report suspected security issues privately using [SECURITY.md](SECURITY.md).
 
 Submissions are expected to be original work or include the required compatible license notices. By submitting a contribution, you agree that it is distributed under this repository's GPL-2.0-or-later license.

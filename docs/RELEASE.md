@@ -8,7 +8,7 @@ The WordPress installer and MCP bridge are distributed as GitHub release assets.
 2. Run `python3 build.py`. This creates `dist/nexpilot-community.zip`, `dist/nexpilot-community-bridge.mjs`, and their SHA-256 checksums.
 3. Inspect the ZIP members. The archive must contain one top-level `nexpilot-community/` directory with the plugin header file, required includes, uninstall handler, readme, and license.
 4. Verify that the plugin header, PHP `VERSION`, `plugin/readme.txt`, changelog, and Git tag identify the same version.
-5. Review the source tree and release files for credentials, personal data, customer-specific endpoints, third-party licensing, and generated artifacts.
+5. Review the source tree and release files for credentials, personal data, private endpoints, third-party licensing, and generated artifacts.
 6. Push a Git tag from the verified commit. The release workflow repeats the checks, builds the four files from `dist/`, and publishes them as release assets. Version tags containing a suffix are marked as prereleases.
 7. Open the README download links and confirm that both files download. Upload the ZIP through **Plugins → Add New → Upload Plugin** on a disposable WordPress site and verify activation.
 

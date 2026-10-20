@@ -41,6 +41,12 @@ jobs:
           PY
       - name: Test PHP protocol
         run: php tests/protocol.php
+      - name: Verify direct-access guards
+        run: |
+          for file in plugin/*.php plugin/includes/*.php; do
+            output=$(php -r 'include $argv[1]; echo "loaded";' "$file")
+            test -z "$output" || { echo "Direct access loaded $file"; exit 1; }
+          done
       - name: Test MCP bridge
         run: node --test tests/bridge.test.mjs
       - name: Build installable files

@@ -1,6 +1,6 @@
 # Security policy
 
-NexPilot Community handles client credentials and publishes a narrow read-only MCP endpoint. Please report a suspected vulnerability privately to the repository maintainers through GitHub's vulnerability reporting feature when it is available. If that feature is unavailable, contact Nexdev through its [official website](https://nexdev.gr) and request a private reporting channel. Do not post credentials, exploit details, or customer data in a public issue.
+NexPilot Community handles connection credentials and publishes a read-only MCP endpoint. Please report a suspected vulnerability privately to the repository maintainers through GitHub's vulnerability reporting feature when it is available. If that feature is unavailable, contact Nexdev through its [official website](https://nexdev.gr) and request a private reporting channel. Do not post credentials or exploit details in a public issue.
 
 ## Supported version
 
