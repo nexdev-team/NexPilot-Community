@@ -1,6 +1,6 @@
 # Implementation parity
 
-This candidate uses the original NexPilot `0.2.1-beta.1` runtime implementation as its source. The earlier Community `0.1.0-beta.1` implementation had a smaller tool set and different plugin identity; it is not an upgrade path for this candidate.
+This distribution uses the original NexPilot `0.2.1-beta.1` runtime implementation as its source. The earlier Community `0.1.0-beta.1` implementation had a smaller tool set and different plugin identity; it is not an upgrade path for this candidate.
 
 ## Source comparison
 
@@ -15,5 +15,7 @@ Consequently, the plugin slug, entry point, REST routes, tool names and handlers
 - `python3 build.py`: produced `dist/nexdev-site-connector-0.2.1-beta.1.zip` with the original plugin directory layout.
 - All executable PHP and JavaScript files in the ZIP and bridge were compared byte-for-byte with the original source edition.
 - The ZIP was checked for private runtime files and the previously identified client-specific strings.
+- The installer activated in an isolated WordPress 7.1.3 / WooCommerce 11.2.1 / PHP 8.1.34 / MariaDB 11.4.13 staging site; 49 synthetic integration checks passed.
+- An isolated upgrade from plugin `0.2.0` to this ZIP retained an existing connection, its read permission, and the tool surface.
 
-These checks do not certify real WordPress, WooCommerce, MySQL/MariaDB, OAuth client, or production integration. An isolated staging installation and release security review remain required before distribution or a change to repository visibility.
+The exact staging evidence is in [RELEASE-EVIDENCE.md](RELEASE-EVIDENCE.md). These checks do not certify every WordPress, WooCommerce, OAuth client, or production environment. Repository visibility remains a separate owner decision.

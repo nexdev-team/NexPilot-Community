@@ -4,7 +4,11 @@
 
 NexPilot is developed by [Nexdev](https://nexdev.gr). This repository carries the full `0.2.1-beta.1` plugin implementation under its original WordPress plugin identity, `nexdev-site-connector`. The MCP endpoint, tool names, connection format, storage keys, and Node.js bridge settings follow that implementation.
 
-The previously published `v0.1.0-beta.1` Community ZIP is a separate, reduced implementation. It is not an update for this plugin. A new download will be published only after the full build and release checks are complete.
+[![Download the WordPress plugin ZIP](assets/download-plugin.svg)](https://github.com/nexdev-team/NexPilot-Community/releases/download/v0.2.1-beta.1/nexdev-site-connector-0.2.1-beta.1.zip)
+
+[MCP bridge](https://github.com/nexdev-team/NexPilot-Community/releases/download/v0.2.1-beta.1/nexdev-mcp.mjs) · [Release notes and checksums](https://github.com/nexdev-team/NexPilot-Community/releases/tag/v0.2.1-beta.1)
+
+While this repository is private, GitHub access is required to download release assets.
 
 [Implementation parity and verification](docs/PARITY.md) records the comparison with the original source edition. No plugin behavior was rewritten for this candidate.
 
@@ -20,17 +24,17 @@ The plugin is beta software. It requires PHP Sodium and a supported database adv
 
 ## Install and connect
 
-1. Build the plugin ZIP with `python3 build.py`. The output is `dist/nexdev-site-connector-0.2.1-beta.1.zip`.
+1. Download the [ready-to-install plugin ZIP](https://github.com/nexdev-team/NexPilot-Community/releases/download/v0.2.1-beta.1/nexdev-site-connector-0.2.1-beta.1.zip). Keep it zipped.
 2. In WordPress, open **Plugins → Add New → Upload Plugin**, install the ZIP, and activate it.
 3. Open **Tools → NexPilot**. Create a separate connection for each MCP client and keep its one-time credential in a private file.
-4. Configure the Node.js 20+ stdio bridge when the MCP client uses stdio:
+4. Download the [Node.js 20+ bridge](https://github.com/nexdev-team/NexPilot-Community/releases/download/v0.2.1-beta.1/nexdev-mcp.mjs) and configure it when the MCP client uses stdio:
 
 ```json
 {
   "mcpServers": {
     "nexdev-site": {
       "command": "node",
-      "args": ["/absolute/path/to/bridge/nexdev-mcp.mjs"],
+      "args": ["/absolute/path/to/nexdev-mcp.mjs"],
       "env": {
         "NSC_ENDPOINT": "https://your-site.example/wp-json/nexdev-connector/v1/mcp",
         "NSC_TOKEN_FILE": "/private/path/client.token"
@@ -50,7 +54,7 @@ node --test tests/bridge.test.mjs
 python3 build.py
 ```
 
-The PHP suite uses WordPress/MySQL doubles and does not certify a production installation. The release process requires separate WordPress, WooCommerce, security, and packaging verification. See [release checks](docs/RELEASE.md).
+The PHP suite uses WordPress/MySQL doubles. The installer was also checked on an isolated WordPress/WooCommerce/MariaDB installation; see [release verification](docs/RELEASE-EVIDENCE.md) and [release checks](docs/RELEASE.md). These checks do not certify every hosting environment.
 
 ## Project information
 
